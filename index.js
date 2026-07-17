@@ -1,6 +1,10 @@
 import express from "express";
+import swaggerUi from "swagger-ui-express";
+import fs from "fs";
 
 const app = express();
+const swaggerDocument = JSON.parse(fs.readFileSync("./openapi.json", "utf8"));
+
 app.use(express.json());
 
 // Task Store
@@ -12,7 +16,9 @@ let tasks = [
 
 const port = 3000;
 
-// API Endpoints
+//Swagger
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 app.get("/", (req, res) => {
   res.json({
     name: "Todo List API",
