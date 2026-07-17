@@ -43,3 +43,13 @@ Keep-Alive: timeout=5
 You can interact with the API visually by running the server and visiting `http://localhost:3000/docs`.
 
 ![Swagger UI Screenshot](./swagger.png)
+
+## Stage 7: AI vs Me
+
+I challenged the AI to build this exact same API to see how it would approach the problem. The AI's code is stored in the `ai-version/` folder.
+
+Here are the key differences I noticed:
+
+1. **Development Tooling:** The AI added `nodemon` and set up `npm run dev` and `start` scripts to automatically restart the server on edits, saving time compared to manually restarting.
+2. **File Structure (MVC):** Instead of one giant file, the AI split the code into an MVC (Model-View-Controller) architecture. It separated the data logic (`models`), the request handling (`controllers`), and the URL mapping (`routes`).
+3. **Maintainability:** Because of the modular layout, the AI's version would be much easier to maintain, scale, and add features to (like authentication or a real database) in a professional environment.
