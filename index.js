@@ -2,6 +2,7 @@ import express from "express";
 import Database from "better-sqlite3";
 import swaggerUi from "swagger-ui-express";
 import fs from "fs";
+import { get } from "https";
 
 const app = express();
 const swaggerDocument = JSON.parse(fs.readFileSync("./openapi.json", "utf8"));
@@ -95,8 +96,10 @@ app.post("/tasks", (req, res) => {
 
 // Update tasks
 app.put("/tasks/:id", (req, res) => {
-  const requestedId = pasrseInt(req.params.id);
-  const task = tasks.find((t) => t.id === requestedId);
+  const requestedId = parseInt(req.params.id);
+
+  const getQuery = db.prepare("SELECT * FROM tasks WHERE id  = ?");
+  const task = getQuery.get(requestedId);
 
   if (!task) {
     return res.status(404).json({ error: "Task not found" });
@@ -105,23 +108,38 @@ app.put("/tasks/:id", (req, res) => {
   if (Object.keys(req.body).length === 0) {
     return res.status(400).json({ error: "Request body cannot be empty" });
   }
-
-  if (req.body.title !== undefined) {
-    task.done = req.body.done;
+  if (req.body.title !== undefined && req.body.title.trim() === "") {
+    return res.status(400).json({ error: "Title cannot be empty" });
   }
 
-  res.json(task);
+  const newTitle = req.body.title !== undefined ? req.body.title : task.title;
+  let newDone = task.done;
+
+  if (req.body.done !== undefined) {
+    newDone = req.body.done ? 1 : 0;
+  }
+
+  const updateQuery = db.prepare(
+    "UPDATE tasks SET title = ?, done = ? WHERE id = ?",
+  );
+  updateQuery.run(newTitle, newDone, requestedId);
+
+  res.json({
+    id: requestedId,
+    title: newTitle,
+    done: newDone,
+  });
 });
 
 // Delete a task
 app.delete("/tasks/:id", (req, res) => {
   const requestedId = parseInt(req.params.id);
-  const taskIndex = tasks.findIndex((t) => t.id === requestedId);
+  const deleteQuery = db.prepare("DELETE FROM tasks WHERE id = ?");
+  const info = deleteQuery.run(requestedId);
 
-  if (taskIndex === -1) {
+  if (info.changes === 0) {
     return res.status(404).json({ error: "Task not found" });
   }
-  tasks.splice(taskIndex, 1);
 
   res.status(204).send();
 });
