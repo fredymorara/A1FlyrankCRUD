@@ -1,4 +1,5 @@
 import express from "express";
+import Database from "better-sqlite3";
 import swaggerUi from "swagger-ui-express";
 import fs from "fs";
 
@@ -7,12 +8,30 @@ const swaggerDocument = JSON.parse(fs.readFileSync("./openapi.json", "utf8"));
 
 app.use(express.json());
 
-// Task Store
-let tasks = [
-  { id: 1, title: "Learn Express", done: true },
-  { id: 2, title: "Build CRUD API", done: false },
-  { id: 3, title: "Publish to Github", done: false },
-];
+//1. connect to the database
+const db = new Database("tasks.db");
+
+//2. create table
+db.exec(`
+  CREATE TABLE IF NOT EXISTS tasks (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  done INTEGER DEFAULT 0
+  )`);
+
+//3. check how many rows currently in tasks table
+const countQuery = db.prepare("SELECT COUNT(*) AS count FROM tasks");
+const result = countQuery.get();
+
+//if count is 0, insert our 3 starter rows
+if (result.count === 0) {
+  const insertTask = db.prepare("INSERT INTO tasks (title, done) VALUES(?,?)");
+  insertTask.run("Learn Express", 1);
+  insertTask.run("Build CRUD API", 0);
+  insertTask.run("Connect to SQLite", 0);
+
+  console.log("Inserted 3 example tasks!");
+}
 
 const port = 3000;
 
