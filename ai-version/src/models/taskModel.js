@@ -1,38 +1,46 @@
-// Simulated Database Model
-let tasks = [
-  { id: 1, title: "Learn Express architecture", done: true },
-  { id: 2, title: "Implement MVC pattern", done: false },
-  { id: 3, title: "Add authentication middleware", done: false },
-];
+import db from "../config/db.js";
 
 export const TaskModel = {
-  findAll: () => tasks,
+  findAll: () => {
+    return db.prepare("SELECT * FROM tasks").all();
+  },
   
-  findById: (id) => tasks.find((t) => t.id === id),
+  findById: (id) => {
+    return db.prepare("SELECT * FROM tasks WHERE id = ?").get(id);
+  },
   
   create: (title) => {
-    let nextId = 1;
-    if (tasks.length > 0) {
-      nextId = Math.max(...tasks.map((task) => task.id)) + 1;
-    }
-    const newTask = { id: nextId, title, done: false };
-    tasks.push(newTask);
-    return newTask;
+    const info = db.prepare("INSERT INTO tasks (title, done) VALUES (?, 0)").run(title);
+    return {
+      id: info.lastInsertRowid,
+      title: title,
+      done: 0
+    };
   },
   
   update: (id, updates) => {
-    const task = tasks.find((t) => t.id === id);
+    // First verify it exists
+    const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id);
     if (!task) return null;
 
-    if (updates.title !== undefined) task.title = updates.title;
-    if (updates.done !== undefined) task.done = updates.done;
-    return task;
+    // Use existing values as defaults if not provided in updates
+    const newTitle = updates.title !== undefined ? updates.title : task.title;
+    let newDone = task.done;
+    if (updates.done !== undefined) {
+        newDone = updates.done ? 1 : 0;
+    }
+
+    db.prepare("UPDATE tasks SET title = ?, done = ? WHERE id = ?").run(newTitle, newDone, id);
+    
+    return {
+      id: id,
+      title: newTitle,
+      done: newDone
+    };
   },
   
   delete: (id) => {
-    const index = tasks.findIndex((t) => t.id === id);
-    if (index === -1) return false;
-    tasks.splice(index, 1);
-    return true;
+    const info = db.prepare("DELETE FROM tasks WHERE id = ?").run(id);
+    return info.changes > 0; // Returns true if a row was deleted, false otherwise
   }
 };
