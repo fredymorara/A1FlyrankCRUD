@@ -55,13 +55,17 @@ app.get("/health", (req, res) => {
 
 // Get all tasks
 app.get("/tasks", (req, res) => {
-  res.json(tasks);
+  const query = db.prepare("SELECT * FROM tasks");
+  const allTasks = query.all();
+  res.json(allTasks);
 });
 
 // Get a specific task
 app.get("/tasks/:id", (req, res) => {
   const requestedId = parseInt(req.params.id);
-  const task = tasks.find((t) => t.id === requestedId);
+  const query = db.prepare("SELECT * FROM tasks WHERE id = ?");
+
+  const task = query.get(requestedId);
 
   if (task) {
     res.json(task);
@@ -76,19 +80,15 @@ app.post("/tasks", (req, res) => {
   if (!title || title.trim() === "") {
     return res.status(400).json({ error: "Title is required" });
   }
-  let nextId = 1;
-  if (tasks.length > 0) {
-    const highestId = Math.max(...tasks.map((task) => task.id));
-    nextId = highestId + 1;
-  }
 
+  const insertQuery = db.prepare(
+    "INSERT INTO tasks (title, done) VALUES (?, ?)",
+  );
+
+  const info = insertQuery.run(title, 0);
   const newTask = {
-    id: nextId,
-    title: title,
-    done: false,
+    id: info.lastInsertRowid,
   };
-
-  tasks.push(newTask);
 
   res.status(201).json(newTask);
 });
