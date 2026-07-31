@@ -8,10 +8,11 @@ services:
       - "3000:3000"
     depends_on:
       - db
+      - cache
     env_file:
       - .env
 
-    # 2. Our PostgreSQL Database
+  # 2. Our PostgreSQL Database
   db:
     image: postgres:15-alpine
     environment:
@@ -25,6 +26,12 @@ services:
       - pgdata:/var/lib/postgresql/data
       # This injects our init.sql script into the container
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # 3. Our Redis Cache
+  cache:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
 
 volumes:
   pgdata:
