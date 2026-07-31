@@ -25,6 +25,12 @@ This is the ultimate survival kit applied in one real task.
 * **Persistence:** Data survives container destruction thanks to a Docker Volume (`pgdata`).
 * **Security:** Connection strings are hidden inside a `.env` file (with a `.env.example` committed).
 
+### 4. [Week 4: Authentication & Security](./week4-auth/)
+Learning to lock the doors. Built a completely secure backend using **Supabase Auth** and **JSON Web Tokens (JWTs)**.
+* **Open Gates:** `signup` and `login` endpoints that communicate directly with Supabase.
+* **Security Middleware:** Built a `requireAuth` function that intercepts requests, checks the JWT, verifies its signature, and protects sensitive endpoints.
+* **Interactive Docs:** Integrated Swagger UI with HTTP Bearer authentication so users can test secured routes easily!
+
 ---
 
 ## 🚀 How to Run the Latest Version (Week 3 - Task 2)
