@@ -25,7 +25,7 @@ This is the ultimate survival kit applied in one real task.
 * **Persistence:** Data survives container destruction thanks to a Docker Volume (`pgdata`).
 * **Security:** Connection strings are hidden inside a `.env` file (with a `.env.example` committed).
 
-### 4. [Week 4: Authentication & Security (The Final Boss)](./week4-auth/)
+### 4. [Week 4: Authentication & Security](./week4-auth/)
 This is the culmination of all four weeks. It takes the entire production stack from Week 3 and locks the doors using **Supabase Auth** and **JSON Web Tokens (JWTs)**.
 * **The Full Stack:** Includes Docker, PostgreSQL, Redis, and MVC architecture.
 * **Open Gates:** `signup` and `login` endpoints that communicate directly with Supabase.
