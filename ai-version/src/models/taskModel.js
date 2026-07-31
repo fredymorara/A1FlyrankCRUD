@@ -1,46 +1,42 @@
-import db from "../config/db.js";
+import pool from "../config/db.js";
 
 export const TaskModel = {
-  findAll: () => {
-    return db.prepare("SELECT * FROM tasks").all();
+  findAll: async () => {
+    const result = await pool.query("SELECT * FROM tasks ORDER BY id ASC");
+    return result.rows; // Postgres puts the data inside a 'rows' array
   },
-  
-  findById: (id) => {
-    return db.prepare("SELECT * FROM tasks WHERE id = ?").get(id);
+
+  findById: async (id) => {
+    const result = await pool.query("SELECT * FROM tasks WHERE id = $1", [id]);
+    return result.rows[0]; // Return the first matched row
   },
-  
-  create: (title) => {
-    const info = db.prepare("INSERT INTO tasks (title, done) VALUES (?, 0)").run(title);
-    return {
-      id: info.lastInsertRowid,
-      title: title,
-      done: 0
-    };
+
+  create: async (title) => {
+    // RETURNING * is a cool Postgres feature that immediately returns the newly inserted row!
+    const result = await pool.query(
+      "INSERT INTO tasks (title, done) VALUES ($1, 0) RETURNING *",
+      [title],
+    );
+    return result.rows[0];
   },
-  
-  update: (id, updates) => {
-    // First verify it exists
-    const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id);
+
+  update: async (id, updates) => {
+    const task = await TaskModel.findById(id);
     if (!task) return null;
 
-    // Use existing values as defaults if not provided in updates
     const newTitle = updates.title !== undefined ? updates.title : task.title;
-    let newDone = task.done;
-    if (updates.done !== undefined) {
-        newDone = updates.done ? 1 : 0;
-    }
+    const newDone =
+      updates.done !== undefined ? (updates.done ? 1 : 0) : task.done;
 
-    db.prepare("UPDATE tasks SET title = ?, done = ? WHERE id = ?").run(newTitle, newDone, id);
-    
-    return {
-      id: id,
-      title: newTitle,
-      done: newDone
-    };
+    const result = await pool.query(
+      "UPDATE tasks SET title = $1, done = $2 WHERE id = $3 RETURNING *",
+      [newTitle, newDone, id],
+    );
+    return result.rows[0];
   },
-  
-  delete: (id) => {
-    const info = db.prepare("DELETE FROM tasks WHERE id = ?").run(id);
-    return info.changes > 0; // Returns true if a row was deleted, false otherwise
-  }
+
+  delete: async (id) => {
+    const result = await pool.query("DELETE FROM tasks WHERE id = $1", [id]);
+    return result.rowCount > 0; // rowCount tells us how many rows were deleted
+  },
 };

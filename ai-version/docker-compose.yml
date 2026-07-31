@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  # 1. Our Node.js Application
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    env_file:
+      - .env
+
+    # 2. Our PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_DB: tasks_db
+    ports:
+      - "5432:5432"
+    volumes:
+      # This saves the DB data permanently on your hard drive (persistence!)
+      - pgdata:/var/lib/postgresql/data
+      # This injects our init.sql script into the container
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  pgdata:
