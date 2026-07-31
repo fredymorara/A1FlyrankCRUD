@@ -1,4 +1,4 @@
-# Week 4: The Ultimate Secured CRUD API
+# Week 4: Adding Auth to our CRUD API
 
 This folder represents the culmination of all four weeks of learning. It merges the **MVC Architecture, PostgreSQL, Docker, and Redis** from Week 3 with the **Supabase JWT Authentication** from Week 4.
 
