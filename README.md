@@ -71,3 +71,11 @@ Here is an example of the SQL query the API runs behind the scenes when you fetc
 ```sql
 SELECT * FROM tasks WHERE id = ?;
 ```
+
+## Week 4: Docker & PostgreSQL 
+
+The AI-Version of this project (`ai-version/`) now uses a real PostgreSQL database running inside a Docker container.
+
+* **Architecture:** We successfully swapped the SQLite repository for a Postgres repository using the `pg` library. Because of the MVC architecture, the routes and controllers did not need to change (aside from adding `async/await` since Postgres operates over a network).
+* **Persistence Proven:** To prove data persistence, I created rows via the API, ran `docker compose down` to destroy the containers, and then ran `docker compose up -d`. When I fetched the data again, the rows were still there, proving the Docker volume (`pgdata`) is working.
+* **Running the project:** Navigate to the `ai-version/` directory and run `docker compose up -d --build` to start both the Node application and the PostgreSQL database simultaneously.
