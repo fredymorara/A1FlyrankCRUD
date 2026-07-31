@@ -20,6 +20,7 @@ To fix the data loss issue, I upgraded the API to use a real database.
 This is the ultimate survival kit applied in one real task.
 * **Architecture:** Implemented the **MVC (Model-View-Controller)** pattern. Swapped the in-memory/SQLite store for a real repository without changing the service or routes.
 * **Database:** **PostgreSQL** database using the `pg` library.
+* **Cache:** Added **Redis** to the stack as a stretch goal, establishing a ping connection on startup to prepare for future caching.
 * **Containerization:** Both the Node.js application and the PostgreSQL database run inside **Docker** containers, orchestrated with `docker-compose.yml`.
 * **Persistence:** Data survives container destruction thanks to a Docker Volume (`pgdata`).
 * **Security:** Connection strings are hidden inside a `.env` file (with a `.env.example` committed).

@@ -8,6 +8,7 @@ Run Postgres in Docker, connect the service to it (swapping the local storage fo
 ## 🚀 Features
 * **Dockerized Stack:** Both the API and the Database run in isolated Docker containers via `docker-compose.yml`.
 * **PostgreSQL:** Replaced SQLite with an enterprise-grade Postgres database using the `pg` library.
+* **Redis Cache (Stretch Goal):** Integrated an in-memory Redis database into the Compose stack and successfully established a connection (pinged) from the Node.js app on startup.
 * **MVC Architecture:** The code is cleanly split into Models, Views, and Controllers. Changing to Postgres only required modifying the Model file; the Controllers and Routes remained completely untouched.
 * **Environment Variables:** Secure connection strings are loaded from a `.env` file (which is git-ignored, with a `.env.example` provided).
 
