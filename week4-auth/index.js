@@ -1,12 +1,18 @@
 import express from 'express';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import swaggerUi from 'swagger-ui-express';
+import fs from 'fs';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 app.use(express.json());
+
+// Load and serve Swagger UI
+const openapiDocument = JSON.parse(fs.readFileSync(new URL('./openapi.json', import.meta.url)));
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiDocument));
 
 // Initialize Supabase Client
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -71,25 +77,55 @@ app.get('/public/info', (req, res) => {
   return res.status(200).json({ message: 'Welcome stranger! This info is public.' });
 });
 
-// Protected Route (Unverified)
-app.get('/protected/profile', (req, res) => {
-  // 1. Get the Authorization header
+// --- STAGE 4: MIDDLEWARE GUARD ---
+const requireAuth = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  // 2. Check if the header exists and starts with "Bearer "
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Access token required' });
   }
 
-  // 3. Extract the token (split on space: ["Bearer", "eyJ..."])
   const token = authHeader.split(' ')[1];
 
   if (!token) {
     return res.status(401).json({ error: 'Access token required' });
   }
 
-  // Right now, we just acknowledge we got it (Verification comes in Stage 3!)
-  return res.status(200).json({ message: 'Token received, but not verified yet!' });
+  const { data, error } = await supabase.auth.getUser(token);
+
+  if (error || !data.user) {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+
+  // Attach the user and token to the request so the next route can use it
+  req.user = data.user;
+  req.token = token;
+  
+  // The guard says "You may pass!"
+  next();
+};
+
+// 3. Log Out Route (Protected)
+app.post('/auth/logout', requireAuth, async (req, res) => {
+  // Call the Supabase SDK sign out method
+  await supabase.auth.signOut();
+  
+  return res.status(204).send();
+});
+
+// Protected Route (Cleaned up using Middleware)
+app.get('/protected/profile', requireAuth, (req, res) => {
+  // We no longer need to check the token here, the middleware already did it!
+  return res.status(200).json({
+    id: req.user.id,
+    email: req.user.email,
+    created_at: req.user.created_at
+  });
+});
+
+// A second protected route to prove the middleware is reusable
+app.get('/protected/dashboard', requireAuth, (req, res) => {
+  return res.status(200).json({ message: `Welcome to your dashboard, ${req.user.email}!` });
 });
 
 const port = process.env.PORT || 3000;

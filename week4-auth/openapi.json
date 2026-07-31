@@ -1,0 +1,109 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Auth API",
+    "version": "1.0.0",
+    "description": "Secure API using Supabase Auth and JWTs"
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "paths": {
+    "/auth/signup": {
+      "post": {
+        "summary": "Sign up a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Created" },
+          "400": { "description": "Bad Request" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Log in and receive JWT",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "Log out the user",
+        "security": [
+          { "bearerAuth": [] }
+        ],
+        "responses": {
+          "204": { "description": "No Content" }
+        }
+      }
+    },
+    "/public/info": {
+      "get": {
+        "summary": "Public gate (No Auth Required)",
+        "responses": {
+          "200": { "description": "OK" }
+        }
+      }
+    },
+    "/protected/profile": {
+      "get": {
+        "summary": "Protected profile (Requires JWT)",
+        "security": [
+          { "bearerAuth": [] }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/protected/dashboard": {
+      "get": {
+        "summary": "Protected dashboard (Requires JWT)",
+        "security": [
+          { "bearerAuth": [] }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    }
+  }
+}
