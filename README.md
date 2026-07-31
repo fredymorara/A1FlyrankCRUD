@@ -1,4 +1,4 @@
-# FlyRank CRUD API: A Backend Learning Journey
+# FlyRank Internship: A Backend AI Engineering Learning Journey
 
 Welcome to the FlyRank CRUD API! This repository represents my journey from building a simple in-memory REST API to deploying a production-ready PostgreSQL architecture using Docker.
 
