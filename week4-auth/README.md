@@ -1,44 +1,46 @@
-# Week 4: Auth Login & Protect
+# Week 4: The Ultimate Secured CRUD API
 
-This folder contains a secure Express REST API that handles user authentication and protects specific routes using **Supabase Auth** and **JSON Web Tokens (JWTs)**.
+This folder represents the culmination of all four weeks of learning. It merges the **MVC Architecture, PostgreSQL, Docker, and Redis** from Week 3 with the **Supabase JWT Authentication** from Week 4.
 
 ## 🎯 Goal
-Build an API that allows users to sign up, log in, and receive secure access tokens. Use an Express middleware guard to verify those tokens with Supabase and block unauthenticated users from accessing protected endpoints.
+Build a production-ready, fully containerized API where anyone can view data, but only authenticated users possessing a valid JSON Web Token (JWT) can create, update, or delete data.
 
-## 🚀 Features
+## 🚀 Architecture & Features
 * **Identity Provider:** Outsourced password hashing and cryptography to Supabase.
-* **Token Verification:** Custom `requireAuth` Express middleware that intercepts requests, checks the JWT signature, and confirms it isn't expired.
-* **Swagger UI:** Configured with a `Bearer Token` security scheme, enabling padlock icons and 1-click authorization testing directly in the browser.
+* **Token Verification:** Custom `requireAuth` Express middleware intercepts write requests, checks the JWT signature, and confirms it isn't expired.
+* **Database:** PostgreSQL database using the `pg` library.
+* **Cache:** Redis caching layer (prepared for future query caching).
+* **Containerization:** The entire Node.js app, Postgres database, and Redis cache run in isolated Docker containers orchestrated by `docker-compose`.
+* **Swagger UI:** Configured with a `Bearer Token` security scheme for 1-click authorization testing directly in the browser.
 
 ## 💻 How to Run Locally
 
-1. **Install Dependencies**
-   ```bash
-   npm install
-   ```
-2. **Environment Variables**
-   Create a `.env` file in the root of this folder and add your Supabase credentials:
+1. **Environment Variables**
+   Create a `.env` file in the root of this folder with your credentials:
    ```text
    SUPABASE_URL=your_supabase_project_url
    SUPABASE_KEY=your_supabase_anon_key
    PORT=3000
+   DATABASE_URL=postgres://myuser:secretpassword@db:5432/tasks_db
+   REDIS_URL=redis://cache:6379
    ```
-   *(Note: The `.env` file is excluded from Git to protect secrets).*
-3. **Start the Server**
+2. **Start the Docker Stack**
    ```bash
-   node index.js
+   docker compose up -d --build
    ```
 
 ## 🔒 API Reference
 
 | Endpoint | Method | Auth Required? | Purpose |
 | :--- | :--- | :--- | :--- |
-| `/public/info` | GET | ❌ No | Access public, unprotected data |
 | `/auth/signup` | POST | ❌ No | Register a new user account |
 | `/auth/login` | POST | ❌ No | Authenticate user & return JWT |
-| `/protected/profile` | GET | 🔐 Yes (JWT) | Read private user profile data |
-| `/protected/dashboard` | GET | 🔐 Yes (JWT) | Read personalized dashboard data |
 | `/auth/logout` | POST | 🔐 Yes (JWT) | Terminate the user session |
+| `/tasks` | GET | ❌ No | View all tasks (Public) |
+| `/tasks/:id` | GET | ❌ No | View a specific task (Public) |
+| `/tasks` | POST | 🔐 Yes (JWT) | Create a new task |
+| `/tasks/:id` | PUT | 🔐 Yes (JWT) | Update a task |
+| `/tasks/:id` | DELETE | 🔐 Yes (JWT) | Delete a task |
 
 ## 📸 Swagger UI
 

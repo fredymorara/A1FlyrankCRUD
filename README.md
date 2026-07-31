@@ -25,24 +25,13 @@ This is the ultimate survival kit applied in one real task.
 * **Persistence:** Data survives container destruction thanks to a Docker Volume (`pgdata`).
 * **Security:** Connection strings are hidden inside a `.env` file (with a `.env.example` committed).
 
-### 4. [Week 4: Authentication & Security](./week4-auth/)
-Learning to lock the doors. Built a completely secure backend using **Supabase Auth** and **JSON Web Tokens (JWTs)**.
+### 4. [Week 4: Authentication & Security (The Final Boss)](./week4-auth/)
+This is the culmination of all four weeks. It takes the entire production stack from Week 3 and locks the doors using **Supabase Auth** and **JSON Web Tokens (JWTs)**.
+* **The Full Stack:** Includes Docker, PostgreSQL, Redis, and MVC architecture.
 * **Open Gates:** `signup` and `login` endpoints that communicate directly with Supabase.
-* **Security Middleware:** Built a `requireAuth` function that intercepts requests, checks the JWT, verifies its signature, and protects sensitive endpoints.
+* **Security Middleware:** Built a `requireAuth` function that intercepts requests, verifies JWT signatures, and protects the `POST`, `PUT`, and `DELETE` routes so only logged-in users can modify the database.
 * **Interactive Docs:** Integrated Swagger UI with HTTP Bearer authentication so users can test secured routes easily!
 
 ---
 
-## 🚀 How to Run the Latest Version (Week 3 - Task 2)
-
-If you want to run the latest version of this project:
-
-1. Navigate to the latest directory:
-   ```bash
-   cd week3-a2-postgres-docker
-   ```
-2. Start the entire stack (App + Database) with one command:
-   ```bash
-   docker compose up -d --build
-   ```
 3. Visit `http://localhost:3000/docs` to view the Swagger UI and interact with the API!
